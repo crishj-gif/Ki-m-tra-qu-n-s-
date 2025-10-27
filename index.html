@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kiểm tra quân số Đại đội 160</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Thư viện cần thiết (đã tối ưu link HTTPS chuẩn cho GitHub Pages) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
@@ -202,11 +205,9 @@
 
       document.getElementById("result").innerHTML = html;
 
-      // Lưu kết quả vào biến toàn cục
       resultData = { tongQD, tongTT, tongVang, reasonSummary };
     }
 
-    // --- Sự kiện nút ---
     document.getElementById("calcBtn").addEventListener("click", tinhTongHop);
 
     document.getElementById("excelBtn").addEventListener("click", () => {
@@ -260,7 +261,6 @@
           y += 7;
         }
       }
-      y += 10;
       doc.text("Designed by Son Cris...", 130, 280);
       doc.save("KiemTraQuanSo_DaiDoi160.pdf");
     });
