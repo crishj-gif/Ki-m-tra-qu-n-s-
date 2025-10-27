@@ -1,269 +1,245 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kiểm tra quân số Đại đội 160</title>
-
-  <!-- Thư viện cần thiết (đã tối ưu link HTTPS chuẩn cho GitHub Pages) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo Quân số Đại đội</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to bottom right, #1a0000, #330000);
-      color: #ffcccc;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #800000, #000);
+      color: white;
       margin: 0;
-      padding: 0;
-      min-height: 100vh;
+      padding: 20px;
     }
 
-    header {
+    h1 {
       text-align: center;
-      background: linear-gradient(to right, #660000, #990000);
-      color: #fff;
-      padding: 20px;
-      font-size: 1.6em;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px #9b1414;
+      color: #ffcccc;
     }
 
     table {
-      width: 90%;
-      margin: 30px auto;
+      width: 100%;
       border-collapse: collapse;
-      background: rgba(50, 0, 0, 0.8);
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(255, 0, 0, 0.4);
+      margin-top: 20px;
     }
 
     th, td {
-      border: 1px solid #800000;
-      padding: 10px;
+      border: 1px solid #ff9999;
+      padding: 8px;
       text-align: center;
     }
 
     th {
-      background: #b30000;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background-color: rgba(255, 0, 0, 0.1);
+      background-color: #990000;
     }
 
     input {
-      width: 80%;
-      padding: 6px;
-      border: 1px solid #990001;
-      border-radius: 5px;
+      width: 80px;
+      padding: 5px;
       text-align: center;
-      background-color: #330000;
-      color: #fff;
+      border-radius: 4px;
+      border: none;
     }
 
-    #buttons {
+    input[type="text"] {
+      width: 100%;
+      text-align: left;
+    }
+
+    .buttons {
       text-align: center;
-      margin: 20px 0;
+      margin-top: 20px;
     }
 
     button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      cursor: pointer;
-      margin: 5px;
+      background-color: #e60000;
       color: white;
-      transition: 0.3s;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
-    #calcBtn { background: #e60000; }
-    #excelBtn { background: #009933; }
-    #pdfBtn { background: #0066cc; }
-
-    button:hover { opacity: 0.8; }
+    button:hover { background-color: #b30000; }
 
     #result {
-      width: 90%;
-      margin: 30px auto;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 10px;
-      padding: 20px;
-      font-size: 1.1em;
-      line-height: 1.8em;
-      color: #ffdddd;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 10px;
-      right: 15px;
-      color: #ff9999;
-      font-size: 0.9em;
-      text-shadow: 1px 1px 2px #000;
-    }
-
-    @media (max-width: 768px) {
-      table, th, td {
-        font-size: 0.9em;
-      }
-      header {
-        font-size: 1.2em;
-      }
-      input {
-        width: 95%;
-      }
+      margin-top: 20px;
+      text-align: left;
+      font-weight: bold;
+      background: rgba(0,0,0,0.4);
+      padding: 10px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <header>🔥 Kiểm tra quân số Đại đội 160 🔥</header>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Lớp</th>
-        <th>Quân số quy định</th>
-        <th>Quân số thực tế</th>
-        <th>Số vắng</th>
-        <th>Lý do vắng (cách nhau bằng dấu phẩy)</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      <tr><td>CNTT1</td><td>24</td><td><input type="number" id="cntt1_thucte"></td><td id="cntt1_vang">0</td><td><input id="cntt1_lydo"></td></tr>
-      <tr><td>CNTT2</td><td>24</td><td><input type="number" id="cntt2_thucte"></td><td id="cntt2_vang">0</td><td><input id="cntt2_lydo"></td></tr>
-      <tr><td>TTNT</td><td>15</td><td><input type="number" id="ttnt_thucte"></td><td id="ttnt_vang">0</td><td><input id="ttnt_lydo"></td></tr>
-      <tr><td>BDATTT</td><td>8</td><td><input type="number" id="bdattt_thucte"></td><td id="bdattt_vang">0</td><td><input id="bdattt_lydo"></td></tr>
-      <tr><td>TBBKNL</td><td>10</td><td><input type="number" id="tbbknl_thucte"></td><td id="tbbknl_vang">0</td><td><input id="tbbknl_lydo"></td></tr>
-      <tr><td>TL</td><td>8</td><td><input type="number" id="tl_thucte"></td><td id="tl_vang">0</td><td><input id="tl_lydo"></td></tr>
-    </tbody>
-  </table>
+<h1>🪖 Báo cáo Quân số Đại đội</h1>
 
-  <div id="buttons">
-    <button id="calcBtn">Tính tổng hợp</button>
-    <button id="excelBtn">Xuất Excel</button>
-    <button id="pdfBtn">Xuất PDF</button>
-  </div>
+<table id="table">
+  <thead>
+    <tr>
+      <th>Lớp</th>
+      <th>Quân số quy định</th>
+      <th>Quân số thực tế</th>
+      <th>Số vắng</th>
+      <th>Lý do vắng (VD: 1 trực ban, 2 trực nhật)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CNTT1</td><td>24</td>
+      <td><input type="number" id="CNTT1_tt"></td>
+      <td id="CNTT1_vang">0</td>
+      <td><input type="text" id="CNTT1_lydo" placeholder="Nhập lý do..."></td>
+    </tr>
+    <tr>
+      <td>CNTT2</td><td>24</td>
+      <td><input type="number" id="CNTT2_tt"></td>
+      <td id="CNTT2_vang">0</td>
+      <td><input type="text" id="CNTT2_lydo" placeholder="Nhập lý do..."></td>
+    </tr>
+    <tr>
+      <td>TTNT</td><td>15</td>
+      <td><input type="number" id="TTNT_tt"></td>
+      <td id="TTNT_vang">0</td>
+      <td><input type="text" id="TTNT_lydo" placeholder="Nhập lý do..."></td>
+    </tr>
+    <tr>
+      <td>BDATTT</td><td>8</td>
+      <td><input type="number" id="BDATTT_tt"></td>
+      <td id="BDATTT_vang">0</td>
+      <td><input type="text" id="BDATTT_lydo" placeholder="Nhập lý do..."></td>
+    </tr>
+    <tr>
+      <td>TBBKNL</td><td>10</td>
+      <td><input type="number" id="TBBKNL_tt"></td>
+      <td id="TBBKNL_vang">0</td>
+      <td><input type="text" id="TBBKNL_lydo" placeholder="Nhập lý do..."></td>
+    </tr>
+  </tbody>
+</table>
 
-  <div id="result"></div>
+<div class="buttons">
+  <button id="calcBtn">Tính tổng hợp</button>
+  <button id="excelBtn">Xuất Excel</button>
+  <button id="pdfBtn">Xuất PDF</button>
+</div>
 
-  <footer>Designed by Son Cris...</footer>
+<div id="result"></div>
 
-  <script>
-    const classes = {
-      cntt1: 24,
-      cntt2: 24,
-      ttnt: 15,
-      bdattt: 8,
-      tbbknl: 10,
-      tl: 8
-    };
+<script>
+const dsLop = {
+  CNTT1: 24,
+  CNTT2: 24,
+  TTNT: 15,
+  BDATTT: 8,
+  TBBKNL: 10
+};
 
-    let resultData = {};
+function tinhTongHop() {
+  let tongQD = 0, tongTT = 0, tongVang = 0;
+  let thongKeLyDo = {};
 
-    function tinhTongHop() {
-      let tongQD = 0, tongTT = 0, tongVang = 0;
-      let allReasons = [];
+  for (const lop in dsLop) {
+    const qd = dsLop[lop];
+    const tt = Number(document.getElementById(lop + "_tt").value) || 0;
+    const vang = Math.max(0, qd - tt);
+    document.getElementById(lop + "_vang").textContent = vang;
+    tongQD += qd;
+    tongTT += tt;
+    tongVang += vang;
 
-      for (const cls in classes) {
-        const quyDinh = classes[cls];
-        const thucTe = parseInt(document.getElementById(cls + "_thucte").value) || 0;
-        const vang = quyDinh - thucTe;
-        tongQD += quyDinh;
-        tongTT += thucTe;
-        tongVang += vang;
-        document.getElementById(cls + "_vang").textContent = vang;
-
-        const lyDo = document.getElementById(cls + "_lydo").value.trim();
-        if (lyDo) {
-          lyDo.split(",").forEach(reason => {
-            reason = reason.trim();
-            if (reason) allReasons.push(reason);
-          });
+    // Lý do
+    const lyDo = document.getElementById(lop + "_lydo").value.trim();
+    if (lyDo) {
+      const mucs = lyDo.split(",").map(m => m.trim());
+      mucs.forEach(m => {
+        const parts = m.match(/(\d+)\s*(.+)/);
+        if (parts) {
+          const so = parseInt(parts[1]);
+          const ten = parts[2];
+          thongKeLyDo[ten] = (thongKeLyDo[ten] || 0) + so;
         }
-      }
-
-      const reasonSummary = {};
-      allReasons.forEach(r => reasonSummary[r] = (reasonSummary[r] || 0) + 1);
-
-      let html = `<b>Tổng quân số quy định:</b> ${tongQD}<br>`;
-      html += `<b>Tổng quân số thực tế:</b> ${tongTT}<br>`;
-      html += `<b>Tổng số vắng:</b> ${tongVang}<br><br>`;
-      html += `<b>Thống kê lý do vắng:</b><br>`;
-      if (Object.keys(reasonSummary).length === 0) {
-        html += `<i>Không có lý do được ghi nhận.</i>`;
-      } else {
-        html += "<ul>";
-        for (const [r, c] of Object.entries(reasonSummary)) {
-          html += `<li>${r}: ${c}</li>`;
-        }
-        html += "</ul>";
-      }
-
-      document.getElementById("result").innerHTML = html;
-
-      resultData = { tongQD, tongTT, tongVang, reasonSummary };
+      });
     }
+  }
 
-    document.getElementById("calcBtn").addEventListener("click", tinhTongHop);
+  let html = `
+  <p>Tổng quân số quy định: ${tongQD}</p>
+  <p>Tổng quân số thực tế: ${tongTT}</p>
+  <p>Tổng số vắng: ${tongVang}</p>
+  <p><b>Thống kê lý do vắng:</b></p><ul>`;
+  for (const ly in thongKeLyDo) {
+    html += `<li>${ly}: ${thongKeLyDo[ly]}</li>`;
+  }
+  html += "</ul>";
 
-    document.getElementById("excelBtn").addEventListener("click", () => {
-      if (!resultData.tongQD) tinhTongHop();
-      const wsData = [["Lớp", "Quân số quy định", "Quân số thực tế", "Số vắng", "Lý do"]];
-      for (const cls in classes) {
-        wsData.push([
-          cls.toUpperCase(),
-          classes[cls],
-          document.getElementById(cls + "_thucte").value || 0,
-          document.getElementById(cls + "_vang").textContent,
-          document.getElementById(cls + "_lydo").value
-        ]);
-      }
-      wsData.push([]);
-      wsData.push(["Tổng QĐ", resultData.tongQD, "Tổng TT", resultData.tongTT, "Vắng: " + resultData.tongVang]);
-      wsData.push([]);
-      wsData.push(["Thống kê lý do"]);
-      for (const [r, c] of Object.entries(resultData.reasonSummary || {})) {
-        wsData.push([r, c]);
-      }
+  document.getElementById("result").innerHTML = html;
+}
 
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      XLSX.utils.book_append_sheet(wb, ws, "KiemTraQuanSo");
-      XLSX.writeFile(wb, "KiemTraQuanSo_DaiDoi160.xlsx");
-    });
+// Tự động tính khi nhập
+document.querySelectorAll('input[type="number"], input[type="text"]').forEach(inp => {
+  inp.addEventListener("input", tinhTongHop);
+});
 
-    document.getElementById("pdfBtn").addEventListener("click", async () => {
-      if (!resultData.tongQD) tinhTongHop();
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 20;
-      doc.setFontSize(16);
-      doc.text("Báo cáo kiểm tra quân số - Đại đội 160", 20, y);
-      y += 10;
-      doc.setFontSize(12);
-      doc.text(`Tổng quân số quy định: ${resultData.tongQD}`, 20, y);
-      y += 7;
-      doc.text(`Tổng quân số thực tế: ${resultData.tongTT}`, 20, y);
-      y += 7;
-      doc.text(`Tổng số vắng: ${resultData.tongVang}`, 20, y);
-      y += 10;
-      doc.text("Thống kê lý do vắng:", 20, y);
-      y += 7;
-      if (Object.keys(resultData.reasonSummary).length === 0) {
-        doc.text("- Không có lý do được ghi nhận", 25, y);
-      } else {
-        for (const [r, c] of Object.entries(resultData.reasonSummary)) {
-          doc.text(`- ${r}: ${c}`, 25, y);
-          y += 7;
-        }
-      }
-      doc.text("Designed by Son Cris...", 130, 280);
-      doc.save("KiemTraQuanSo_DaiDoi160.pdf");
-    });
-  </script>
+// Enter để chuyển ô tiếp theo
+const inputs = Array.from(document.querySelectorAll("input"));
+inputs.forEach((input, i) => {
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const next = inputs[i + 1] || inputs[0];
+      next.focus();
+    }
+  });
+});
+
+// Xuất Excel
+document.getElementById("excelBtn").addEventListener("click", () => {
+  const wb = XLSX.utils.book_new();
+  const data = [["Lớp", "QĐ", "TT", "Vắng", "Lý do"]];
+  for (const lop in dsLop) {
+    data.push([
+      lop,
+      dsLop[lop],
+      document.getElementById(lop + "_tt").value || 0,
+      document.getElementById(lop + "_vang").textContent,
+      document.getElementById(lop + "_lydo").value
+    ]);
+  }
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "BaoCao");
+  XLSX.writeFile(wb, "BaoCao_QuanSo.xlsx");
+});
+
+// Xuất PDF
+document.getElementById("pdfBtn").addEventListener("click", () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text("Báo cáo Quân số Đại đội", 70, 10);
+  const body = Object.keys(dsLop).map(lop => [
+    lop,
+    dsLop[lop],
+    document.getElementById(lop + "_tt").value || 0,
+    document.getElementById(lop + "_vang").textContent,
+    document.getElementById(lop + "_lydo").value
+  ]);
+
+  doc.autoTable({
+    startY: 20,
+    head: [["Lớp", "QĐ", "TT", "Vắng", "Lý do"]],
+    body: body
+  });
+
+  doc.save("BaoCao_QuanSo.pdf");
+});
+</script>
 </body>
 </html>
