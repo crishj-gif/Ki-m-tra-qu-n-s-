@@ -70,7 +70,7 @@
               <th class="p-4 font-semibold text-center min-w-[60px]">QĐ</th>
               <th class="p-4 font-semibold text-center min-w-[80px]">TT</th>
               <th class="p-4 font-semibold text-center min-w-[60px]">Vắng</th>
-              <th class="p-4 font-semibold min-w-[200px]">Lý do vắng(VD:1 trực ban, 1 trực nhật)</th>
+              <th class="p-4 font-semibold min-w-[200px]">Lý do vắng (VD: 1 ốm, 2 gác)</th>
             </tr>
           </thead>
           <tbody id="tbody" class="text-sm divide-y divide-slate-700">
@@ -205,6 +205,7 @@
 
     function tinhTongHop(){
       let tongQD=0, tongTT=0, tongVang=0;
+      let tongLyDo=0; // Biến tổng để check lỗi
       const statLyDo = {};
 
       for(const id in data){
@@ -224,10 +225,10 @@
             if(m){
               const so = parseInt(m[1],10);
               const ten = m[2].trim();
-              if(ten) statLyDo[ten] = (statLyDo[ten]||0) + so;
-            } else {
-                // Nếu không có số cụ thể, đếm là 1 cho lý do đó (optional, code cũ của bạn không có cái này nhưng nên thêm để nó không bị lờ đi)
-                // Tuy nhiên giữ logic cũ của bạn để tránh lỗi
+              if(ten) {
+                  statLyDo[ten] = (statLyDo[ten]||0) + so;
+                  tongLyDo += so; // Cộng dồn số người trong lý do để so sánh
+              }
             }
           });
         }
@@ -240,6 +241,26 @@
         }
       }
 
+      const resDiv = document.getElementById('result');
+      resDiv.classList.remove('hidden');
+
+      // --- LOGIC KIỂM TRA MỚI ---
+      // So sánh tổng vắng và tổng số lượng khai báo trong lý do
+      if (tongVang !== tongLyDo) {
+        resDiv.innerHTML = `
+          <div class="flex flex-col items-center justify-center p-6 bg-red-500/10 border-2 border-red-500 rounded-xl text-center animate-pulse">
+            <div class="text-5xl mb-3">⚠️</div>
+            <h3 class="text-2xl font-bold text-red-500 uppercase mb-2">Trực ban kiểm tra lại việc nhập</h3>
+            <p class="text-slate-300 text-lg">
+              Tổng số vắng thực tế (<b class="text-white">${tongVang}</b>) không khớp với tổng số báo lý do (<b class="text-white">${tongLyDo}</b>).
+            </p>
+            <p class="text-sm text-slate-400 mt-2 italic">(Vui lòng kiểm tra lại số lượng trong cột "Lý do vắng")</p>
+          </div>
+        `;
+        return; // Dừng lại, không in báo cáo
+      }
+
+      // Nếu KHỚP -> Xuất báo cáo
       let html = `
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div class="bg-slate-800 p-3 rounded border border-slate-600">
@@ -264,12 +285,10 @@
         for(const name in statLyDo) html += `<li><span class="text-white font-medium">${name}:</span> <span class="text-yellow-400 font-bold">${statLyDo[name]}</span></li>`;
         html += '</ul>';
       } else {
-        html += '<p class="text-slate-500 italic"></p>';
+        html += '<p class="text-slate-500 italic">— Không có dữ liệu lý do hợp lệ (Định dạng: "Số lượng + Lý do") —</p>';
       }
 
-      const resDiv = document.getElementById('result');
       resDiv.innerHTML = html;
-      resDiv.classList.remove('hidden');
     }
 
     function attachListeners(){
@@ -356,5 +375,3 @@
   </script>
 </body>
 </html>
-
-
