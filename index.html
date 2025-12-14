@@ -1,245 +1,358 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Báo cáo Quân số Đại đội</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a"> <!-- Màu thanh trạng thái khớp với bg-slate-900 -->
+
+  <!-- Thư viện xử lý Excel và PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  
+  <!-- Thêm Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Cấu hình Tailwind (nếu cần custom thêm) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'military-green': '#4ade80', // Màu điểm nhấn
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
+    /* Chỉ giữ lại style cho thanh cuộn tùy chỉnh nếu muốn, còn lại dùng Tailwind */
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #800000, #000);
-      color: white;
-      margin: 0;
-      padding: 20px;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
-
-    h1 {
-      text-align: center;
-      color: #ffcccc;
+    /* Ẩn mũi tên tăng giảm trong input number */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      border: 1px solid #ff9999;
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #990000;
-    }
-
-    input {
-      width: 80px;
-      padding: 5px;
-      text-align: center;
-      border-radius: 4px;
-      border: none;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      text-align: left;
-    }
-
-    .buttons {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    button {
-      background-color: #e60000;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover { background-color: #b30000; }
-
-    #result {
-      margin-top: 20px;
-      text-align: left;
-      font-weight: bold;
-      background: rgba(0,0,0,0.4);
-      padding: 10px;
-      border-radius: 8px;
+    input[type=number] {
+      -moz-appearance: textfield;
     }
   </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans">
 
-<h1>🪖 Báo cáo Quân số Đại đội</h1>
+  <!-- Main Content -->
+  <main class="flex-grow w-full max-w-5xl mx-auto p-4 md:p-6 pb-24">
+    
+    <!-- Header -->
+    <header class="mb-8 text-center">
+      <h1 class="text-2xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 uppercase tracking-wide drop-shadow-sm">
+        🪖 Báo cáo Quân số
+      </h1>
+      
+    </header>
 
-<table id="table">
-  <thead>
-    <tr>
-      <th>Lớp</th>
-      <th>Quân số quy định</th>
-      <th>Quân số thực tế</th>
-      <th>Số vắng</th>
-      <th>Lý do vắng (VD: 1 trực ban, 2 trực nhật)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>CNTT1</td><td>24</td>
-      <td><input type="number" id="CNTT1_tt"></td>
-      <td id="CNTT1_vang">0</td>
-      <td><input type="text" id="CNTT1_lydo" placeholder="Nhập lý do..."></td>
-    </tr>
-    <tr>
-      <td>CNTT2</td><td>24</td>
-      <td><input type="number" id="CNTT2_tt"></td>
-      <td id="CNTT2_vang">0</td>
-      <td><input type="text" id="CNTT2_lydo" placeholder="Nhập lý do..."></td>
-    </tr>
-    <tr>
-      <td>TTNT</td><td>15</td>
-      <td><input type="number" id="TTNT_tt"></td>
-      <td id="TTNT_vang">0</td>
-      <td><input type="text" id="TTNT_lydo" placeholder="Nhập lý do..."></td>
-    </tr>
-    <tr>
-      <td>BDATTT</td><td>8</td>
-      <td><input type="number" id="BDATTT_tt"></td>
-      <td id="BDATTT_vang">0</td>
-      <td><input type="text" id="BDATTT_lydo" placeholder="Nhập lý do..."></td>
-    </tr>
-    <tr>
-      <td>TBBKNL</td><td>10</td>
-      <td><input type="number" id="TBBKNL_tt"></td>
-      <td id="TBBKNL_vang">0</td>
-      <td><input type="text" id="TBBKNL_lydo" placeholder="Nhập lý do..."></td>
-    </tr>
-  </tbody>
-</table>
+    <!-- Card chứa bảng -->
+    <div class="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
+      
+      <!-- Wrapper cho bảng để scroll ngang trên mobile -->
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-700/50 text-slate-300 text-xs md:text-sm uppercase tracking-wider border-b border-slate-600">
+              <th class="p-4 font-semibold min-w-[80px]">Lớp</th>
+              <th class="p-4 font-semibold text-center min-w-[60px]">QĐ</th>
+              <th class="p-4 font-semibold text-center min-w-[80px]">TT</th>
+              <th class="p-4 font-semibold text-center min-w-[60px]">Vắng</th>
+              <th class="p-4 font-semibold min-w-[200px]">Lý do vắng</th>
+            </tr>
+          </thead>
+          <tbody id="tbody" class="text-sm divide-y divide-slate-700">
+            <!-- Rows sẽ được JS render vào đây -->
+          </tbody>
+        </table>
+      </div>
 
-<div class="buttons">
-  <button id="calcBtn">Tính tổng hợp</button>
-  <button id="excelBtn">Xuất Excel</button>
-  <button id="pdfBtn">Xuất PDF</button>
-</div>
+      <!-- Khu vực điều khiển (Buttons) -->
+      <div class="p-4 bg-slate-800 border-t border-slate-700">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button id="calcBtn" class="col-span-2 md:col-span-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg shadow transition-colors flex items-center justify-center gap-2">
+            <span>📊</span> Tính tổng
+          </button>
+          
+          <button id="excelBtn" class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold rounded-lg shadow transition-colors flex items-center justify-center gap-2">
+            <span>📗</span> Excel
+          </button>
+          
+          <button id="pdfBtn" class="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-lg shadow transition-colors flex items-center justify-center gap-2">
+            <span>📘</span> PDF
+          </button>
+          
+          <button id="clearBtn" class="py-2.5 px-4 bg-slate-600 hover:bg-slate-500 active:bg-slate-700 text-white font-medium rounded-lg shadow transition-colors flex items-center justify-center gap-2">
+            <span>🗑️</span> Xóa
+          </button>
+        </div>
+      </div>
 
-<div id="result"></div>
+      <!-- Kết quả -->
+      <div id="result" class="hidden border-t border-slate-700 bg-slate-900/50 p-6 text-slate-200 animate-fade-in">
+        <!-- JS điền kết quả vào đây -->
+      </div>
+    </div>
+  </main>
 
-<script>
-const dsLop = {
-  CNTT1: 24,
-  CNTT2: 24,
-  TTNT: 15,
-  BDATTT: 8,
-  TBBKNL: 10
-};
+  <!-- Footer -->
+  <footer class="bg-slate-950/80 backdrop-blur-md border-t border-slate-800 text-slate-400 py-4 w-full z-50">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        
+        <!-- Thông tin bản quyền -->
+        <div class="text-center md:text-left flex flex-col">
+            <span class="text-xs font-medium uppercase tracking-widest text-slate-500">Designed by</span>
+            <b class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 text-lg font-bold">Sơn Cris</b>
+            <span class="text-[10px] text-slate-600">&copy; 2025 Kiểm tra quân số</span>
+        </div>
 
-function tinhTongHop() {
-  let tongQD = 0, tongTT = 0, tongVang = 0;
-  let thongKeLyDo = {};
+        <!-- Social Links -->
+        <div class="flex flex-wrap justify-center gap-3">
+            <!-- Phone -->
+            <a href="tel:0327208690" class="group flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 hover:bg-green-600 text-white transition-all duration-300 shadow-lg border border-slate-700 hover:border-green-500 hover:-translate-y-1">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 512 512"><path d="M164.9 24.6c-48 0-87.1 39.1-87.1 87.1v278.7c0 48 39.1 87.1 87.1 87.1h182.2c48 0 87.1-39.1 87.1-87.1V111.7c0-48-39.1-87.1-87.1-87.1H164.9zM256 464c-15.4 0-27.9-12.5-27.9-27.9s12.5-27.9 27.9-27.9 27.9 12.5 27.9 27.9-12.5 27.9-27.9 27.9zm135.2-348.8H122.9V392h268.3V115.2z"/></svg>
+            </a>
+            
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/son_cris3012/" target="_blank" class="group flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 hover:bg-gradient-to-br hover:from-pink-500 hover:to-orange-500 text-white transition-all duration-300 shadow-lg border border-slate-700 hover:border-pink-500 hover:-translate-y-1">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 448 512"><path d="M224.1 12.6C99.2-22.3-22.3 99.2 12.6 224.1l11.2 11.2c19.3 19.3 46.4 30.1 74.5 30.1h145.4c28.1 0 55.2-10.8 74.5-30.1l11.2-11.2C485.6 99.2 364.1-22.3 239.1 12.6L224.1 27.7l-15 42.1c-14.4 40.3-43.7 70.8-82.6 86.6L48.2 168.1C25.3 177.1 8.5 197.6 8.5 221v82c0 23.4 16.8 43.9 39.7 52.9l84.4 32.1c38.9 15.8 68.2 46.3 82.6 86.6l15 42.1 15-42.1c14.4-40.3 43.7-70.8 82.6-86.6l84.4-32.1c22.9-9 39.7-29.5 39.7-52.9v-82c0-23.4-16.8-43.9-39.7-52.9l-84.4-32.1c-38.9-15.8-68.2-46.3-82.6-86.6l-15-42.1L224.1 27.7zM169.1 296.8c-29.4-29.4-29.4-77 0-106.4s77-29.4 106.4 0 29.4 77 0 106.4-77 29.4-106.4 0zm53.2-61.9c-15.5-15.5-15.5-40.7 0-56.2s40.7-15.5 56.2 0 15.5 40.7 0 56.2-40.7 15.5-56.2 0zm117.8 7.3c15.2-15.2 15.2-39.8 0-55s-39.8-15.2-55 0c-15.2 15.2-15.2 39.8 0 55s39.8 15.2 55 0z"/></svg>
+            </a>
+            
+            <!-- Facebook -->
+            <a href="https://web.facebook.com/sonsadboiz.12" target="_blank" class="group flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 hover:bg-blue-600 text-white transition-all duration-300 shadow-lg border border-slate-700 hover:border-blue-500 hover:-translate-y-1">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 448 512"><path d="M400 32H48A48 48 0 0 0 0 80v352a48 48 0 0 0 48 48h137.25V327.37h-51.2v-60.3h51.2v-44.4a76.43 76.43 0 0 1 76.4-76.4h37.7v59.7h-37.7c-25.1 0-25.1 9.2-25.1 25.4v40.7h63.2l-10.1 60.3h-53.1V480H400a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48z"/></svg>
+            </a>
 
-  for (const lop in dsLop) {
-    const qd = dsLop[lop];
-    const tt = Number(document.getElementById(lop + "_tt").value) || 0;
-    const vang = Math.max(0, qd - tt);
-    document.getElementById(lop + "_vang").textContent = vang;
-    tongQD += qd;
-    tongTT += tt;
-    tongVang += vang;
+            <!-- TikTok -->
+            <a href="https://www.tiktok.com/@chubodoihaybuon" target="_blank" class="group flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 hover:bg-black hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] text-white transition-all duration-300 shadow-lg border border-slate-700 hover:border-slate-500 hover:-translate-y-1">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 448 512"><path d="M448 209.91a210.06 210.06 0 0 1-122.77-39.25V349.38A162.55 162.55 0 1 1 185 188.31V278.2a74.62 74.62 0 1 0 52.23 71.18V0l88 0a121.18 121.18 0 0 0 1.86 22.17h0A122.18 122.18 0 0 0 448 209.91Z"/></svg>
+            </a>
 
-    // Lý do
-    const lyDo = document.getElementById(lop + "_lydo").value.trim();
-    if (lyDo) {
-      const mucs = lyDo.split(",").map(m => m.trim());
-      mucs.forEach(m => {
-        const parts = m.match(/(\d+)\s*(.+)/);
-        if (parts) {
-          const so = parseInt(parts[1]);
-          const ten = parts[2];
-          thongKeLyDo[ten] = (thongKeLyDo[ten] || 0) + so;
+        </div>
+    </div>
+  </footer>
+
+  <script>
+    const defaultClasses = [
+      { id: 'CNTT1', qd: 24 },
+      { id: 'CNTT2', qd: 24 },
+      { id: 'TTNT', qd: 15 },
+      { id: 'BDATTT', qd: 8 },
+      { id: 'TBBKNL', qd: 10 },
+      { id: 'TL', qd: 8 }
+    ];
+
+    const STORAGE_KEY = 'quanso_data_v1';
+
+    function loadData(){
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if(saved){
+        try { return JSON.parse(saved); } catch(e) { localStorage.removeItem(STORAGE_KEY); }
+      }
+      const init = {};
+      defaultClasses.forEach(c => { init[c.id] = { qd: c.qd, tt: '', lydo: '' } });
+      return init;
+    }
+
+    let data = loadData();
+
+    function renderTable(){
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+      for(const id in data){
+        const row = data[id];
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition-colors";
+        
+        // Tính toán vắng ngay lúc render để hiện thị màu sắc
+        const qd = Number(row.qd);
+        const tt = Number(row.tt) || 0;
+        const vang = Math.max(0, qd - tt);
+        const vangClass = vang > 0 ? "text-red-400 font-bold" : "text-slate-400";
+
+        tr.innerHTML = `
+          <td class="p-3 border-b border-slate-700 font-medium text-slate-200">${id}</td>
+          <td class="p-3 border-b border-slate-700 text-center text-slate-300">${row.qd}</td>
+          <td class="p-3 border-b border-slate-700 text-center">
+            <input type="number" data-id="${id}" class="tt bg-slate-900/80 border border-slate-600 text-center text-white rounded w-16 md:w-20 py-1 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all" value="${row.tt ?? ''}" placeholder="0" min="0">
+          </td>
+          <td id="${id}_vang" class="p-3 border-b border-slate-700 text-center ${vangClass}">${vang}</td>
+          <td class="p-3 border-b border-slate-700">
+            <input type="text" data-id="${id}" class="lydo bg-slate-900/80 border border-slate-600 text-white rounded w-full py-1 px-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" value="${row.lydo ?? ''}" placeholder="Nhập lý do...">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+      attachListeners();
+    }
+    renderTable();
+
+    function saveData(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function tinhTongHop(){
+      let tongQD=0, tongTT=0, tongVang=0;
+      const statLyDo = {};
+
+      for(const id in data){
+        const qd = Number(data[id].qd) || 0;
+        const tt = Number(data[id].tt) || 0;
+        const vang = Math.max(0, qd - tt);
+
+        tongQD += qd;
+        tongTT += tt;
+        tongVang += vang;
+
+        const s = (data[id].lydo || '').trim();
+        if(s){
+          s.split(',').map(p=>p.trim()).forEach(part=>{
+            // Regex tìm số ở đầu câu (ví dụ "2 ốm" -> 2, "ốm" -> null)
+            const m = part.match(/^(\d+)\s*(.+)$/);
+            if(m){
+              const so = parseInt(m[1],10);
+              const ten = m[2].trim();
+              if(ten) statLyDo[ten] = (statLyDo[ten]||0) + so;
+            } else {
+                // Nếu không có số cụ thể, đếm là 1 cho lý do đó (optional, code cũ của bạn không có cái này nhưng nên thêm để nó không bị lờ đi)
+                // Tuy nhiên giữ logic cũ của bạn để tránh lỗi
+            }
+          });
         }
+        
+        // Cập nhật lại màu text cột vắng
+        const elVang = document.getElementById(id + '_vang');
+        if(elVang) {
+            elVang.textContent = vang;
+            elVang.className = `p-3 border-b border-slate-700 text-center ${vang > 0 ? "text-red-400 font-bold" : "text-slate-400"}`;
+        }
+      }
+
+      let html = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-slate-800 p-3 rounded border border-slate-600">
+                <p class="text-xs text-slate-400 uppercase">Quân số quy định</p>
+                <p class="text-2xl font-bold text-white">${tongQD}</p>
+            </div>
+            <div class="bg-slate-800 p-3 rounded border border-slate-600">
+                <p class="text-xs text-slate-400 uppercase">Thực tế có mặt</p>
+                <p class="text-2xl font-bold text-green-400">${tongTT}</p>
+            </div>
+            <div class="bg-slate-800 p-3 rounded border border-slate-600">
+                <p class="text-xs text-slate-400 uppercase">Tổng vắng</p>
+                <p class="text-2xl font-bold text-red-400">${tongVang}</p>
+            </div>
+        </div>
+        
+        <h3 class="font-semibold text-lg text-blue-300 mb-2 border-b border-slate-700 pb-1">Chi tiết lý do vắng:</h3>
+      `;
+      
+      if(Object.keys(statLyDo).length){
+        html += '<ul class="space-y-1 list-disc list-inside text-slate-300">';
+        for(const name in statLyDo) html += `<li><span class="text-white font-medium">${name}:</span> <span class="text-yellow-400 font-bold">${statLyDo[name]}</span></li>`;
+        html += '</ul>';
+      } else {
+        html += '<p class="text-slate-500 italic">— Không có dữ liệu lý do hợp lệ (Định dạng: "Số lượng + Lý do") —</p>';
+      }
+
+      const resDiv = document.getElementById('result');
+      resDiv.innerHTML = html;
+      resDiv.classList.remove('hidden');
+    }
+
+    function attachListeners(){
+      const inputs = [...document.querySelectorAll('input.tt, input.lydo')];
+      inputs.forEach((inp,i) => {
+        inp.addEventListener('input', e=>{
+          const id = e.target.dataset.id;
+          if(!id) return;
+          if(e.target.classList.contains('tt')) data[id].tt = e.target.value;
+          if(e.target.classList.contains('lydo')) data[id].lydo = e.target.value;
+          saveData();
+          
+          // Cập nhật ngay số vắng khi nhập
+          const qd = Number(data[id].qd)||0, tt = Number(data[id].tt)||0;
+          const vang = Math.max(0, qd - tt);
+          const el = document.getElementById(id + '_vang');
+          if(el) {
+              el.textContent = vang;
+              // Update style realtime
+              el.className = `p-3 border-b border-slate-700 text-center ${vang > 0 ? "text-red-400 font-bold" : "text-slate-400"}`;
+          }
+        });
+
+        inp.addEventListener('keydown', e=>{
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            const next = inputs[i+1] || inputs[0];
+            next.focus();
+            next.select && next.select();
+          }
+        });
       });
     }
-  }
 
-  let html = `
-  <p>Tổng quân số quy định: ${tongQD}</p>
-  <p>Tổng quân số thực tế: ${tongTT}</p>
-  <p>Tổng số vắng: ${tongVang}</p>
-  <p><b>Thống kê lý do vắng:</b></p><ul>`;
-  for (const ly in thongKeLyDo) {
-    html += `<li>${ly}: ${thongKeLyDo[ly]}</li>`;
-  }
-  html += "</ul>";
+    document.getElementById('calcBtn').addEventListener('click', tinhTongHop);
 
-  document.getElementById("result").innerHTML = html;
-}
+    document.getElementById('excelBtn').addEventListener('click', ()=>{
+      const aoa = [['Lớp','QĐ','TT','Vắng','Lý do']];
+      for(const id in data){
+        const qd = data[id].qd;
+        const tt = data[id].tt || 0;
+        const vang = Math.max(0, qd - (Number(tt)||0));
+        aoa.push([id, qd, tt, vang, data[id].lydo || '']);
+      }
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'BaoCao');
+      XLSX.writeFile(wb, 'BaoCao_QuanSo.xlsx');
+    });
 
-// Tự động tính khi nhập
-document.querySelectorAll('input[type="number"], input[type="text"]').forEach(inp => {
-  inp.addEventListener("input", tinhTongHop);
-});
+    document.getElementById('pdfBtn').addEventListener('click', ()=>{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text('BAO CAO QUAN SO DAI DOI', 105, 20, null, null, 'center');
+      
+      const rows = Object.keys(data).map(id => {
+        const qd = data[id].qd;
+        const tt = data[id].tt || 0;
+        const vang = Math.max(0, qd - (Number(tt)||0));
+        return [id, String(qd), String(tt), String(vang), data[id].lydo || ''];
+      });
+      
+      doc.autoTable({ 
+        startY: 30, 
+        head: [['Lop','QD','TT','Vang','Ly do']], 
+        body: rows,
+        theme: 'grid',
+        headStyles: { fillColor: [41, 128, 185] },
+      });
+      doc.save('BaoCao_QuanSo.pdf');
+    });
 
-// Enter để chuyển ô tiếp theo
-const inputs = Array.from(document.querySelectorAll("input"));
-inputs.forEach((input, i) => {
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const next = inputs[i + 1] || inputs[0];
-      next.focus();
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      if(!confirm('Xóa toàn bộ dữ liệu đã lưu?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      data = loadData();
+      renderTable();
+      document.getElementById('result').classList.add('hidden');
+    });
+
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
     }
-  });
-});
-
-// Xuất Excel
-document.getElementById("excelBtn").addEventListener("click", () => {
-  const wb = XLSX.utils.book_new();
-  const data = [["Lớp", "QĐ", "TT", "Vắng", "Lý do"]];
-  for (const lop in dsLop) {
-    data.push([
-      lop,
-      dsLop[lop],
-      document.getElementById(lop + "_tt").value || 0,
-      document.getElementById(lop + "_vang").textContent,
-      document.getElementById(lop + "_lydo").value
-    ]);
-  }
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "BaoCao");
-  XLSX.writeFile(wb, "BaoCao_QuanSo.xlsx");
-});
-
-// Xuất PDF
-document.getElementById("pdfBtn").addEventListener("click", () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.text("Báo cáo Quân số Đại đội", 70, 10);
-  const body = Object.keys(dsLop).map(lop => [
-    lop,
-    dsLop[lop],
-    document.getElementById(lop + "_tt").value || 0,
-    document.getElementById(lop + "_vang").textContent,
-    document.getElementById(lop + "_lydo").value
-  ]);
-
-  doc.autoTable({
-    startY: 20,
-    head: [["Lớp", "QĐ", "TT", "Vắng", "Lý do"]],
-    body: body
-  });
-
-  doc.save("BaoCao_QuanSo.pdf");
-});
-</script>
+  </script>
 </body>
 </html>
