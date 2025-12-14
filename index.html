@@ -264,7 +264,7 @@
         for(const name in statLyDo) html += `<li><span class="text-white font-medium">${name}:</span> <span class="text-yellow-400 font-bold">${statLyDo[name]}</span></li>`;
         html += '</ul>';
       } else {
-        html += '<p class="text-slate-500 italic">— Không có dữ liệu lý do hợp lệ (Định dạng: "Số lượng + Lý do") —</p>';
+        html += '<p class="text-slate-500 italic"></p>';
       }
 
       const resDiv = document.getElementById('result');
@@ -356,3 +356,4 @@
   </script>
 </body>
 </html>
+
